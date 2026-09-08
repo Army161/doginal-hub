@@ -91,6 +91,28 @@ body {
     0 0 60px rgba(255,177,221,0.1);
   background: var(--darker);
   border: 3px solid var(--lavender);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.card-glow.rarity-common {
+  border-color: #8dffa4;
+  box-shadow: 0 0 20px rgba(141,255,164,0.4), 0 0 40px rgba(141,255,164,0.15);
+}
+.card-glow.rarity-rare {
+  border-color: #64ffff;
+  box-shadow: 0 0 20px rgba(100,255,255,0.5), 0 0 40px rgba(100,255,255,0.2);
+}
+.card-glow.rarity-epic {
+  border-color: #debcff;
+  box-shadow: 0 0 20px rgba(222,188,255,0.5), 0 0 40px rgba(222,188,255,0.2);
+}
+.card-glow.rarity-legendary {
+  border-color: #ffe154;
+  box-shadow: 0 0 24px rgba(255,225,84,0.6), 0 0 48px rgba(255,225,84,0.3);
+  animation: shimmer 2s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%, 100% { box-shadow: 0 0 24px rgba(255,225,84,0.6), 0 0 48px rgba(255,225,84,0.3); }
+  50% { box-shadow: 0 0 36px rgba(255,225,84,0.9), 0 0 60px rgba(255,225,84,0.5), 0 0 80px rgba(255,177,221,0.2); }
 }
 #cardCanvas {
   display: block;
@@ -142,7 +164,14 @@ body {
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   margin-bottom: 20px;
+  max-height: 320px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--lavender) var(--darker);
 }
+.dog-grid::-webkit-scrollbar { width: 6px; }
+.dog-grid::-webkit-scrollbar-track { background: var(--darker); }
+.dog-grid::-webkit-scrollbar-thumb { background: var(--lavender); border-radius: 3px; }
 .dog-thumb {
   border: 2px solid rgba(255,255,255,0.15);
   background: var(--darker);
@@ -173,7 +202,31 @@ body {
   margin-top: 2px;
 }
 
-/* Color swatches */
+/* Rarity selector */
+.rarity-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.rarity-btn {
+  padding: 8px 14px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  border: 2px solid rgba(255,255,255,0.15);
+  background: var(--darker);
+  color: var(--white);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.rarity-btn:hover { transform: scale(1.05); }
+.rarity-btn.selected { border-width: 3px; }
+.rarity-btn[data-rarity="common"].selected { border-color: #8dffa4; color: #8dffa4; box-shadow: 0 0 10px rgba(141,255,164,0.3); }
+.rarity-btn[data-rarity="rare"].selected { border-color: #64ffff; color: #64ffff; box-shadow: 0 0 10px rgba(100,255,255,0.3); }
+.rarity-btn[data-rarity="epic"].selected { border-color: #debcff; color: #debcff; box-shadow: 0 0 10px rgba(222,188,255,0.3); }
+.rarity-btn[data-rarity="legendary"].selected { border-color: #ffe154; color: #ffe154; box-shadow: 0 0 10px rgba(255,225,84,0.3); }
+
+/* Color swatches + patterns */
 .swatch-row {
   display: flex;
   gap: 8px;
@@ -188,6 +241,56 @@ body {
 }
 .swatch:hover { transform: scale(1.15); }
 .swatch.selected { border-color: var(--white); box-shadow: 0 0 10px rgba(255,255,255,0.3); }
+.pattern-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 8px;
+  margin-bottom: 6px;
+  display: block;
+}
+.pattern-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pattern-btn {
+  padding: 6px 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  border: 2px solid rgba(255,255,255,0.15);
+  background: var(--darker);
+  color: var(--cream);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.pattern-btn:hover { border-color: var(--cyan); }
+.pattern-btn.selected { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 8px rgba(100,255,255,0.2); }
+
+/* Traits */
+.traits-grid {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.trait-btn {
+  padding: 8px 12px;
+  font-size: 12px;
+  border: 2px solid rgba(255,255,255,0.15);
+  background: var(--darker);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--white);
+}
+.trait-btn span {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+}
+.trait-btn:hover { border-color: var(--pink); transform: scale(1.05); }
+.trait-btn.active { border-color: var(--yellow); background: rgba(255,225,84,0.1); box-shadow: 0 0 8px rgba(255,225,84,0.2); }
 
 /* Stats display */
 .stats-display {
@@ -237,11 +340,32 @@ body {
 .btn-cyan { background: var(--cyan); box-shadow: 0 0 12px rgba(100,255,255,0.4); }
 .btn-pink { background: var(--pink); box-shadow: 0 0 12px rgba(255,177,221,0.4); }
 .btn-coral { background: var(--coral); box-shadow: 0 0 12px rgba(255,125,130,0.4); }
+.btn-lavender { background: var(--lavender); box-shadow: 0 0 12px rgba(222,188,255,0.4); }
 .btn-outline {
   background: transparent;
   color: var(--cyan);
   border: 2px solid var(--cyan);
 }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--darker);
+  border: 2px solid var(--yellow);
+  color: var(--cream);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  padding: 14px 24px;
+  z-index: 999;
+  box-shadow: 0 0 20px rgba(255,225,84,0.3);
+  transition: transform 0.3s ease;
+  text-align: center;
+  max-width: 90vw;
+}
+.toast.visible { transform: translateX(-50%) translateY(0); }
 
 /* Advanced toggle */
 .advanced-toggle {
@@ -292,7 +416,7 @@ body {
 <div class="builder">
   <!-- Card Preview -->
   <div class="card-preview-wrap">
-    <div class="card-glow">
+    <div class="card-glow rarity-common" id="cardGlow">
       <canvas id="cardCanvas" width="400" height="560"></canvas>
     </div>
   </div>
@@ -320,9 +444,39 @@ body {
       <input type="number" id="dogNum" value="1" min="1" max="9999">
     </div>
 
+    <!-- RARITY -->
+    <div class="control-group">
+      <label>Rarity</label>
+      <div class="rarity-row" id="rarityRow">
+        <button class="rarity-btn selected" data-rarity="common">Common</button>
+        <button class="rarity-btn" data-rarity="rare">Rare</button>
+        <button class="rarity-btn" data-rarity="epic">Epic</button>
+        <button class="rarity-btn" data-rarity="legendary">Legendary</button>
+      </div>
+    </div>
+
     <div class="control-group">
       <label>Card Background</label>
       <div class="swatch-row" id="swatchRow"></div>
+      <span class="pattern-label">Patterns</span>
+      <div class="pattern-row" id="patternRow">
+        <button class="pattern-btn selected" data-pattern="none">None</button>
+        <button class="pattern-btn" data-pattern="pixels">Pixel Grid</button>
+        <button class="pattern-btn" data-pattern="stars">Stars</button>
+        <button class="pattern-btn" data-pattern="paws">Paws</button>
+      </div>
+    </div>
+
+    <!-- TRAITS -->
+    <div class="control-group">
+      <label>Traits / Accessories</label>
+      <div class="traits-grid" id="traitsGrid">
+        <button class="trait-btn" data-trait="crown">👑 <span>Crown</span></button>
+        <button class="trait-btn" data-trait="sunglasses">🕶️ <span>Shades</span></button>
+        <button class="trait-btn" data-trait="star">🌟 <span>Star</span></button>
+        <button class="trait-btn" data-trait="diamond">💎 <span>Diamond</span></button>
+        <button class="trait-btn" data-trait="fire">🔥 <span>Fire</span></button>
+      </div>
     </div>
 
     <div class="control-group">
@@ -334,9 +488,13 @@ body {
       <button class="btn btn-yellow" id="randomBtn">Randomize</button>
       <button class="btn btn-cyan" id="dlBtn">Download PNG</button>
       <button class="btn btn-pink" id="shareBtn">Share to X</button>
+      <button class="btn btn-lavender" id="mintBtn">MINT AS NFT</button>
     </div>
   </div>
 </div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
 <script>
 const DOGS = [
@@ -370,21 +528,40 @@ const BRAND_COLORS = [
   { hex: '#ff7d82', name: 'Coral' }
 ];
 
-const STAT_NAMES = ['Rarity', 'Power', 'Speed', 'Charm'];
+const STAT_NAMES = ['Power', 'Speed', 'Charm', 'Luck'];
 const STAT_COLORS = ['#ffb1dd', '#64ffff', '#ffe154', '#8dffa4'];
+
+const RARITY_MAP = {
+  common:    { color: '#8dffa4', label: 'COMMON',    glowAlpha: 0.15 },
+  rare:      { color: '#64ffff', label: 'RARE',      glowAlpha: 0.2 },
+  epic:      { color: '#debcff', label: 'EPIC',      glowAlpha: 0.25 },
+  legendary: { color: '#ffe154', label: 'LEGENDARY', glowAlpha: 0.35 }
+};
+
+// Generate serial number
+function genSerial() {
+  const hex = Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+  const ts = String(Date.now()).slice(-4);
+  return 'DD-' + hex + '-' + ts;
+}
 
 let state = {
   dogName: 'Atlas',
   dogNum: 1,
   bgColor: '#debcff',
+  bgPattern: 'none',
+  rarity: 'common',
   stats: [75, 60, 80, 90],
   selectedDogIdx: 0,
   customUrl: '',
-  dogImage: null
+  dogImage: null,
+  traits: { crown: false, sunglasses: false, star: false, diamond: false, fire: false },
+  serial: genSerial()
 };
 
 const canvas = document.getElementById('cardCanvas');
 const ctx = canvas.getContext('2d');
+const cardGlow = document.getElementById('cardGlow');
 
 // Build dog grid
 const dogGrid = document.getElementById('dogGrid');
@@ -427,6 +604,37 @@ BRAND_COLORS.forEach((c, i) => {
   swatchRow.appendChild(sw);
 });
 
+// Rarity
+document.querySelectorAll('.rarity-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rarity-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.rarity = btn.dataset.rarity;
+    cardGlow.className = 'card-glow rarity-' + state.rarity;
+    render();
+  });
+});
+
+// Patterns
+document.querySelectorAll('.pattern-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.pattern-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.bgPattern = btn.dataset.pattern;
+    render();
+  });
+});
+
+// Traits
+document.querySelectorAll('.trait-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const t = btn.dataset.trait;
+    state.traits[t] = !state.traits[t];
+    btn.classList.toggle('active', state.traits[t]);
+    render();
+  });
+});
+
 // Stats display
 function buildStatsUI() {
   const sd = document.getElementById('statsDisplay');
@@ -456,9 +664,26 @@ document.getElementById('imgUrl').addEventListener('change', e => {
 document.getElementById('randomBtn').addEventListener('click', () => {
   state.stats = STAT_NAMES.map(() => Math.floor(Math.random() * 80) + 20);
   state.bgColor = BRAND_COLORS[Math.floor(Math.random() * BRAND_COLORS.length)].hex;
+  const rarities = ['common', 'rare', 'epic', 'legendary'];
+  const weights = [50, 30, 15, 5];
+  let r = Math.random() * 100, acc = 0;
+  for (let i = 0; i < rarities.length; i++) {
+    acc += weights[i];
+    if (r < acc) { state.rarity = rarities[i]; break; }
+  }
+  // Random traits
+  Object.keys(state.traits).forEach(t => { state.traits[t] = Math.random() < 0.3; });
+  state.bgPattern = ['none', 'pixels', 'stars', 'paws'][Math.floor(Math.random() * 4)];
+  state.serial = genSerial();
+
+  // Update UI
   document.querySelectorAll('.swatch').forEach((sw, i) => {
     sw.classList.toggle('selected', BRAND_COLORS[i].hex === state.bgColor);
   });
+  document.querySelectorAll('.rarity-btn').forEach(b => b.classList.toggle('selected', b.dataset.rarity === state.rarity));
+  document.querySelectorAll('.pattern-btn').forEach(b => b.classList.toggle('selected', b.dataset.pattern === state.bgPattern));
+  document.querySelectorAll('.trait-btn').forEach(b => b.classList.toggle('active', !!state.traits[b.dataset.trait]));
+  cardGlow.className = 'card-glow rarity-' + state.rarity;
   buildStatsUI();
   render();
 });
@@ -466,7 +691,8 @@ document.getElementById('randomBtn').addEventListener('click', () => {
 // Download
 document.getElementById('dlBtn').addEventListener('click', () => {
   const link = document.createElement('a');
-  link.download = 'doginal-card-' + String(state.dogNum).padStart(4, '0') + '.png';
+  const nameClean = (state.dogName || 'Dog').replace(/[^a-zA-Z0-9]/g, '');
+  link.download = 'DoginalDog-' + nameClean + '-' + String(state.dogNum).padStart(4, '0') + '.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
 });
@@ -474,9 +700,25 @@ document.getElementById('dlBtn').addEventListener('click', () => {
 // Share
 document.getElementById('shareBtn').addEventListener('click', () => {
   const num = '#' + String(state.dogNum).padStart(4, '0');
-  const text = encodeURIComponent('Check out my Doginal Dog ' + num + '! 🐕 Build yours at doginaldogs.com @doginaldogs @ARMYDOGINALDOGS #DoginaldDogs #Doginals');
+  const rarityLabel = RARITY_MAP[state.rarity].label;
+  const text = encodeURIComponent(
+    '🃏 I just built my Doginal Dog Collector Card! Meet ' + state.dogName + ' ' + num + ' — ' + rarityLabel + ' edition! Build yours 👉 https://doginal-hub.vercel.app/card-builder.html @doginaldogs @ARMYDOGINALDOGS #DoginaldDogs #NFT #Doginals'
+  );
   window.open('https://x.com/intent/tweet?text=' + text, '_blank');
 });
+
+// Mint button
+document.getElementById('mintBtn').addEventListener('click', () => {
+  showToast('NFT minting coming soon! Your card design will be saved. 🐕');
+});
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  setTimeout(() => t.classList.remove('visible'), 3500);
+}
 
 // Load dog image
 function loadDogImage(url) {
@@ -486,18 +728,170 @@ function loadDogImage(url) {
   img.onerror = () => { state.dogImage = null; render(); };
   img.src = url;
 }
-
-// Initial load
 loadDogImage(DOGS[0].img);
+
+// --- PATTERN DRAWING ---
+function drawPattern(W, H, bgColor) {
+  if (state.bgPattern === 'none') return;
+
+  ctx.save();
+  const darker = darkenColor(bgColor, 0.12);
+
+  if (state.bgPattern === 'pixels') {
+    ctx.fillStyle = darker;
+    const sz = 16;
+    for (let y = 0; y < H; y += sz * 2) {
+      for (let x = 0; x < W; x += sz * 2) {
+        ctx.fillRect(x, y, sz, sz);
+        ctx.fillRect(x + sz, y + sz, sz, sz);
+      }
+    }
+  } else if (state.bgPattern === 'stars') {
+    ctx.fillStyle = darker;
+    for (let i = 0; i < 40; i++) {
+      const sx = (i * 97 + 13) % W;
+      const sy = (i * 67 + 29) % H;
+      drawPixelStar(sx, sy, 6, darker);
+    }
+  } else if (state.bgPattern === 'paws') {
+    ctx.fillStyle = darker;
+    for (let i = 0; i < 20; i++) {
+      const px = (i * 123 + 37) % (W - 30) + 15;
+      const py = (i * 89 + 47) % (H - 30) + 15;
+      drawPixelPaw(px, py, 12, darker);
+    }
+  }
+  ctx.restore();
+}
+
+function drawPixelStar(cx, cy, size, color) {
+  ctx.fillStyle = color;
+  const s = size / 3;
+  ctx.fillRect(cx - s/2, cy - size/2, s, size); // vertical
+  ctx.fillRect(cx - size/2, cy - s/2, size, s); // horizontal
+  // diag pixels
+  ctx.fillRect(cx - s, cy - s, s, s);
+  ctx.fillRect(cx, cy - s, s, s);
+  ctx.fillRect(cx - s, cy, s, s);
+  ctx.fillRect(cx, cy, s, s);
+}
+
+function drawPixelPaw(cx, cy, size, color) {
+  ctx.fillStyle = color;
+  const s = size / 4;
+  // Pads
+  ctx.fillRect(cx - s*2, cy - s, s, s);
+  ctx.fillRect(cx + s, cy - s, s, s);
+  ctx.fillRect(cx - s*1.5, cy - s*2, s, s);
+  ctx.fillRect(cx + s*0.5, cy - s*2, s, s);
+  // Main pad
+  ctx.fillRect(cx - s, cy, s*2, s*1.5);
+}
+
+function darkenColor(hex, amount) {
+  let r = parseInt(hex.slice(1,3), 16);
+  let g = parseInt(hex.slice(3,5), 16);
+  let b = parseInt(hex.slice(5,7), 16);
+  r = Math.max(0, Math.floor(r * (1 - amount)));
+  g = Math.max(0, Math.floor(g * (1 - amount)));
+  b = Math.max(0, Math.floor(b * (1 - amount)));
+  return '#' + [r,g,b].map(c => c.toString(16).padStart(2, '0')).join('');
+}
+
+// --- TRAIT DRAWING ---
+function drawTraits(W, imgY, imgH) {
+  if (state.traits.crown) {
+    // Yellow crown above dog image area
+    const cx = W / 2, cy = imgY + 10;
+    ctx.fillStyle = '#ffe154';
+    ctx.fillRect(cx - 20, cy, 40, 8);
+    ctx.fillRect(cx - 20, cy - 8, 6, 8);
+    ctx.fillRect(cx - 3, cy - 12, 6, 12);
+    ctx.fillRect(cx + 14, cy - 8, 6, 8);
+    // Gem dots
+    ctx.fillStyle = '#ff7d82';
+    ctx.fillRect(cx - 18, cy - 4, 3, 3);
+    ctx.fillRect(cx, cy - 8, 3, 3);
+    ctx.fillRect(cx + 16, cy - 4, 3, 3);
+  }
+
+  if (state.traits.sunglasses) {
+    // Cyan rectangles over face area
+    const cy = imgY + imgH / 2 + 10;
+    ctx.fillStyle = '#0d0d1a';
+    ctx.fillRect(W/2 - 32, cy, 28, 12);
+    ctx.fillRect(W/2 + 4, cy, 28, 12);
+    ctx.fillRect(W/2 - 4, cy + 3, 8, 4);
+    ctx.fillStyle = '#64ffff';
+    ctx.fillRect(W/2 - 30, cy + 2, 24, 8);
+    ctx.fillRect(W/2 + 6, cy + 2, 24, 8);
+  }
+
+  if (state.traits.star) {
+    // Yellow star badge top-right
+    const sx = W - 56, sy = 68;
+    ctx.fillStyle = '#ffe154';
+    drawPixelStar(sx, sy, 18, '#ffe154');
+    // Inner glow
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(sx - 2, sy - 2, 4, 4);
+  }
+
+  if (state.traits.diamond) {
+    // Blue diamond bottom-left
+    const dx = 36, dy = imgY + imgH - 24;
+    ctx.fillStyle = '#64ffff';
+    const s = 4;
+    ctx.fillRect(dx - s, dy, s*2, s);
+    ctx.fillRect(dx - s*2, dy + s, s*4, s);
+    ctx.fillRect(dx - s*3, dy + s*2, s*6, s);
+    ctx.fillRect(dx - s*2, dy + s*3, s*4, s);
+    ctx.fillRect(dx - s, dy + s*4, s*2, s);
+    // Shine
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(dx - s, dy + s, s, s);
+  }
+
+  if (state.traits.fire) {
+    // Coral flame on sides
+    drawFlame(24, imgY + imgH - 50, '#ff7d82');
+    drawFlame(W - 40, imgY + imgH - 50, '#ff7d82');
+  }
+}
+
+function drawFlame(x, y, color) {
+  ctx.fillStyle = color;
+  const s = 4;
+  ctx.fillRect(x + s, y, s*2, s);
+  ctx.fillRect(x, y + s, s*4, s);
+  ctx.fillRect(x, y + s*2, s*4, s);
+  ctx.fillRect(x + s, y + s*3, s*2, s);
+  // Inner orange
+  ctx.fillStyle = '#ffe154';
+  ctx.fillRect(x + s, y + s, s*2, s);
+  ctx.fillRect(x + s, y + s*2, s, s);
+}
 
 // RENDER
 function render() {
   const W = 400, H = 560;
   ctx.clearRect(0, 0, W, H);
 
+  const rarity = RARITY_MAP[state.rarity];
+
   // BG
   ctx.fillStyle = state.bgColor;
   ctx.fillRect(0, 0, W, H);
+
+  // Pattern overlay
+  drawPattern(W, H, state.bgColor);
+
+  // Rarity border glow (inner)
+  ctx.strokeStyle = rarity.color;
+  ctx.lineWidth = 4;
+  ctx.globalAlpha = rarity.glowAlpha + 0.3;
+  ctx.strokeRect(4, 4, W - 8, H - 8);
+  ctx.globalAlpha = 1;
 
   // Inner card border
   ctx.strokeStyle = '#0d0d1a';
@@ -520,6 +914,14 @@ function render() {
   ctx.fillStyle = '#64ffff';
   ctx.textAlign = 'right';
   ctx.fillText(numStr, W - 24, 73);
+
+  // Rarity badge (left side)
+  ctx.fillStyle = rarity.color;
+  ctx.fillRect(16, 56, 80, 24);
+  ctx.font = '8px "Press Start 2P"';
+  ctx.fillStyle = '#0d0d1a';
+  ctx.textAlign = 'center';
+  ctx.fillText(rarity.label, 56, 72);
 
   // Dog image area
   const imgY = 60;
@@ -550,6 +952,9 @@ function render() {
     ctx.fillText('Loading...', W / 2, imgY + imgH / 2);
   }
 
+  // Draw traits
+  drawTraits(W, imgY, imgH);
+
   // Dog name
   ctx.fillStyle = '#0d0d1a';
   ctx.fillRect(20, 328, W - 40, 36);
@@ -564,23 +969,20 @@ function render() {
   const barW = 160;
   const barH = 14;
   STAT_NAMES.forEach((name, i) => {
-    const y = statsY + i * 40;
+    const y = statsY + i * 36;
 
     ctx.font = '8px "Press Start 2P"';
     ctx.fillStyle = '#0d0d1a';
     ctx.textAlign = 'left';
     ctx.fillText(name.toUpperCase(), 30, y + 4);
 
-    // Value
     ctx.fillStyle = STAT_COLORS[i];
     ctx.textAlign = 'right';
     ctx.fillText(String(state.stats[i]), W - 30, y + 4);
 
-    // Bar bg
     ctx.fillStyle = 'rgba(13,13,26,0.5)';
     ctx.fillRect(30, y + 10, barW, barH);
 
-    // Bar fill (pixelated segments)
     const fillW = (state.stats[i] / 100) * barW;
     ctx.fillStyle = STAT_COLORS[i];
     const segW = 8;
@@ -589,6 +991,12 @@ function render() {
       ctx.fillRect(30 + x, y + 10, w, barH);
     }
   });
+
+  // Serial number
+  ctx.font = '7px "Press Start 2P"';
+  ctx.fillStyle = 'rgba(13,13,26,0.7)';
+  ctx.textAlign = 'left';
+  ctx.fillText(state.serial, 16, H - 36);
 
   // Footer
   ctx.fillStyle = '#0d0d1a';

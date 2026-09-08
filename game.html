@@ -78,6 +78,77 @@ body {
   position: relative;
 }
 
+/* Name entry overlay */
+#nameOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--darker);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+#nameOverlay.hidden { display: none; }
+#nameOverlay h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(14px, 3vw, 22px);
+  color: var(--coral);
+  text-shadow: 0 0 20px rgba(255,125,130,0.4);
+  text-align: center;
+}
+#nameOverlay .sub-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--cream);
+  opacity: 0.7;
+}
+#nameInput {
+  width: 300px;
+  max-width: 80vw;
+  padding: 14px 18px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  text-align: center;
+  background: var(--dark);
+  color: var(--yellow);
+  border: 3px solid var(--yellow);
+  box-shadow: 0 0 20px rgba(255,225,84,0.2);
+  outline: none;
+  text-transform: uppercase;
+}
+#nameInput:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 20px rgba(100,255,255,0.3);
+}
+#nameInput::placeholder {
+  color: rgba(255,225,84,0.3);
+}
+#joinBtn {
+  padding: 14px 32px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  background: var(--yellow);
+  color: var(--dark);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(255,225,84,0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+#joinBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px rgba(255,225,84,0.6);
+}
+.name-decor-dog {
+  width: 80px;
+  animation: floatDog 2s ease-in-out infinite alternate;
+}
+@keyframes floatDog {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-12px); }
+}
+
 .game-container {
   position: relative;
   border: 4px solid var(--yellow);
@@ -114,6 +185,7 @@ canvas#gameCanvas {
   font-family: 'Press Start 2P', monospace;
   font-size: 10px;
 }
+.score-bar .player { color: var(--pink); }
 .score-bar .dogi { color: var(--yellow); }
 .score-bar .score { color: var(--cyan); }
 
@@ -131,9 +203,138 @@ canvas#gameCanvas {
   font-size: 9px;
   color: var(--cream);
 }
+
+/* Game Over HTML Overlay */
+#gameOverOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(7,7,15,0.92);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow-y: auto;
+  padding: 30px 16px;
+}
+#gameOverOverlay.visible { display: flex; }
+
+.go-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(16px, 3vw, 24px);
+  color: var(--coral);
+  text-shadow: 0 0 20px rgba(255,125,130,0.5);
+}
+.go-player {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--pink);
+}
+.go-score {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(18px, 4vw, 28px);
+  color: var(--white);
+}
+.go-dogi {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: var(--yellow);
+}
+.go-best {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--mint);
+  margin-bottom: 4px;
+}
+
+/* Leaderboard */
+.lb-wrap {
+  width: 100%;
+  max-width: 500px;
+  margin: 4px 0;
+}
+.lb-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--lavender);
+  text-align: center;
+  margin-bottom: 8px;
+}
+.lb-loading {
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--cream);
+  animation: blinker 1s step-start infinite;
+}
+@keyframes blinker { 50% { opacity: 0; } }
+
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+}
+.lb-table th {
+  padding: 6px 4px;
+  text-align: left;
+  color: var(--cream);
+  border-bottom: 2px solid rgba(255,225,84,0.3);
+}
+.lb-table th:last-child, .lb-table td:last-child { text-align: right; }
+.lb-table th:nth-child(3), .lb-table td:nth-child(3) { text-align: right; }
+.lb-table td {
+  padding: 5px 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: var(--white);
+}
+.lb-table tr.me td {
+  background: rgba(255,225,84,0.12);
+  color: var(--yellow);
+}
+.lb-table tr:nth-child(1) td:first-child { color: var(--yellow); }
+.lb-table tr:nth-child(2) td:first-child { color: var(--white); }
+.lb-table tr:nth-child(3) td:first-child { color: var(--coral); }
+
+.go-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+.go-btn {
+  padding: 12px 24px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.go-btn:hover { transform: translateY(-2px); }
+.go-btn-play {
+  background: var(--yellow);
+  color: var(--dark);
+  box-shadow: 0 0 14px rgba(255,225,84,0.4);
+}
+.go-btn-share {
+  background: var(--cyan);
+  color: var(--dark);
+  box-shadow: 0 0 14px rgba(100,255,255,0.4);
+}
 </style>
 </head>
 <body>
+
+<!-- NAME ENTRY OVERLAY -->
+<div id="nameOverlay">
+  <img src="https://cdn.prod.website-files.com/691115821a026cc99483f73b/692734989b144598a56a8f4c___0000_Layer-3-copy.png" alt="Doginal Dog" class="name-decor-dog">
+  <h2>ENTER YOUR NAME, SER</h2>
+  <p class="sub-text" style="font-family:'Press Start 2P',monospace;font-size:9px;color:var(--cream);opacity:0.7">Your name on the global leaderboard</p>
+  <input type="text" id="nameInput" placeholder="DOGE MASTER" maxlength="20" autocomplete="off" spellcheck="false">
+  <button id="joinBtn">🐕 JOIN THE PACK</button>
+</div>
 
 <nav class="nav">
   <a href="index.html"><img src="https://cdn.prod.website-files.com/691115821a026cc99483f73b/6911292c0fcfc7c8195a3123_Doginal%20Dogs%20LOGO%20White.png" alt="Doginal Dogs"></a>
@@ -143,6 +344,7 @@ canvas#gameCanvas {
 
 <div class="game-wrap">
   <div class="score-bar">
+    <span class="player" id="playerDisplay"></span>
     <span class="score" id="scoreDisplay">SCORE: 0</span>
     <span class="dogi" id="dogiDisplay">DOGI: 0.00</span>
   </div>
@@ -156,10 +358,32 @@ canvas#gameCanvas {
   <p class="game-info"><kbd>SPACE</kbd> or <kbd>UP</kbd> or <kbd>TAP</kbd> to jump</p>
 </div>
 
+<!-- GAME OVER OVERLAY (HTML) -->
+<div id="gameOverOverlay">
+  <div class="go-title">GAME OVER</div>
+  <div class="go-player" id="goPlayer"></div>
+  <div class="go-score" id="goScore"></div>
+  <div class="go-dogi" id="goDogi"></div>
+  <div class="go-best" id="goBest"></div>
+
+  <div class="lb-wrap">
+    <div class="lb-title">🏆 GLOBAL LEADERBOARD</div>
+    <div id="lbBody"><div class="lb-loading">LOADING SCORES...</div></div>
+  </div>
+
+  <div class="go-btns">
+    <button class="go-btn go-btn-play" id="goPlayAgain">PLAY AGAIN</button>
+    <button class="go-btn go-btn-share" id="goShare">SHARE ON X</button>
+  </div>
+</div>
+
 <script>
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const W = 800, H = 400;
+
+// API base — works on Vercel (relative) or falls back to localStorage
+const API_BASE = '/api/scores';
 
 // Load dog sprite image
 const dogSpriteImg = new Image();
@@ -210,26 +434,169 @@ let obstacles = [];
 let dog = { x: 80, y: GROUND_Y - 40, w: 40, h: 40, vy: 0, onGround: true };
 let blinkTimer = 0;
 
-// Leaderboard
-function getLeaderboard() {
-  try { return JSON.parse(localStorage.getItem('dd_leaderboard') || '[]'); } catch { return []; }
-}
-function saveScore(s) {
-  const lb = getLeaderboard();
-  lb.push(s);
-  lb.sort((a, b) => b - a);
-  localStorage.setItem('dd_leaderboard', JSON.stringify(lb.slice(0, 5)));
-}
-function getBest() {
-  const lb = getLeaderboard();
-  return lb.length ? lb[0] : 0;
+// Player
+let playerName = localStorage.getItem('dd_player_name') || '';
+
+// --- NAME ENTRY ---
+const nameOverlay = document.getElementById('nameOverlay');
+const nameInput = document.getElementById('nameInput');
+const joinBtn = document.getElementById('joinBtn');
+
+function initNameEntry() {
+  if (playerName) {
+    nameOverlay.classList.add('hidden');
+    document.getElementById('playerDisplay').textContent = playerName.toUpperCase();
+    return;
+  }
+  nameOverlay.classList.remove('hidden');
+  nameInput.focus();
 }
 
+joinBtn.addEventListener('click', confirmName);
+nameInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmName();
+});
+
+function confirmName() {
+  const n = nameInput.value.trim();
+  if (!n) { nameInput.style.borderColor = C.coral; return; }
+  playerName = n.slice(0, 20);
+  localStorage.setItem('dd_player_name', playerName);
+  nameOverlay.classList.add('hidden');
+  document.getElementById('playerDisplay').textContent = playerName.toUpperCase();
+}
+
+// --- LEADERBOARD (localStorage + API) ---
+function getLocalLeaderboard() {
+  try { return JSON.parse(localStorage.getItem('dd_global_lb') || '[]'); } catch { return []; }
+}
+function saveLocalLeaderboard(entries) {
+  localStorage.setItem('dd_global_lb', JSON.stringify(entries.slice(0, 50)));
+}
+
+function addLocalScore(name, sc, dogi) {
+  const lb = getLocalLeaderboard();
+  lb.push({ name: name.slice(0, 20), score: sc, dogi: dogi, date: new Date().toISOString() });
+  lb.sort((a, b) => b.score - a.score);
+  if (lb.length > 50) lb.splice(50);
+  saveLocalLeaderboard(lb);
+  return lb;
+}
+
+// All-time best for this player
+function getPlayerBest() {
+  const lb = getLocalLeaderboard();
+  const mine = lb.filter(e => e.name === playerName);
+  return mine.length ? mine[0].score : 0;
+}
+
+// API calls
+async function submitScoreAPI(name, sc, dogi) {
+  try {
+    const res = await fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, score: sc, dogi })
+    });
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    return data.scores || null;
+  } catch { return null; }
+}
+
+async function fetchLeaderboardAPI() {
+  try {
+    const res = await fetch(API_BASE);
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    return data.scores || null;
+  } catch { return null; }
+}
+
+// --- GAME OVER OVERLAY ---
+const gameOverOverlay = document.getElementById('gameOverOverlay');
+
+async function showGameOverUI() {
+  const sc = score;
+  const dogi = (sc / 100).toFixed(2);
+
+  // Save locally first
+  const localLb = addLocalScore(playerName, sc, parseFloat(dogi));
+  const best = getPlayerBest();
+
+  // Fill UI
+  document.getElementById('goPlayer').textContent = playerName.toUpperCase();
+  document.getElementById('goScore').textContent = 'SCORE: ' + sc;
+  document.getElementById('goDogi').textContent = '🪙 DOGI EARNED: ' + dogi;
+  document.getElementById('goBest').textContent = 'ALL-TIME BEST: ' + best + ' | DOGI: ' + (best / 100).toFixed(2);
+
+  // Show loading
+  const lbBody = document.getElementById('lbBody');
+  lbBody.innerHTML = '<div class="lb-loading">LOADING SCORES...</div>';
+  gameOverOverlay.classList.add('visible');
+
+  // Try API first
+  let apiScores = await submitScoreAPI(playerName, sc, parseFloat(dogi));
+  if (!apiScores) {
+    apiScores = await fetchLeaderboardAPI();
+  }
+
+  // Merge: prefer API if available, fallback to local
+  const displayScores = (apiScores || localLb).slice(0, 10);
+  renderLeaderboardTable(displayScores, playerName, sc);
+}
+
+function renderLeaderboardTable(entries, currentName, currentScore) {
+  const lbBody = document.getElementById('lbBody');
+  if (!entries.length) {
+    lbBody.innerHTML = '<div class="lb-loading">NO SCORES YET — BE THE FIRST!</div>';
+    return;
+  }
+
+  const rankEmojis = ['👑', '🥈', '🥉'];
+  let html = '<table class="lb-table"><thead><tr><th>RANK</th><th>NAME</th><th>SCORE</th><th>DOGI</th></tr></thead><tbody>';
+  entries.forEach((e, i) => {
+    const isMe = e.name === currentName && e.score === currentScore;
+    const rankLabel = i < 3 ? rankEmojis[i] : (i + 1);
+    html += '<tr class="' + (isMe ? 'me' : '') + '">';
+    html += '<td>' + rankLabel + '</td>';
+    html += '<td>' + escHtml(e.name) + '</td>';
+    html += '<td>' + e.score + '</td>';
+    html += '<td>' + (e.dogi != null ? e.dogi.toFixed(2) : (e.score / 100).toFixed(2)) + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  lbBody.innerHTML = html;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function hideGameOverUI() {
+  gameOverOverlay.classList.remove('visible');
+}
+
+// Play Again
+document.getElementById('goPlayAgain').addEventListener('click', () => {
+  hideGameOverUI();
+  startGame();
+});
+
+// Share on X
+document.getElementById('goShare').addEventListener('click', () => {
+  const sc = score;
+  const dogi = (sc / 100).toFixed(2);
+  const text = encodeURIComponent(
+    '🐕 I just scored ' + sc + ' in Dog Dash and earned ' + dogi + ' DOGICOIN tokens! Can you beat me? Play now 👉 https://doginal-hub.vercel.app/game.html @doginaldogs @ARMYDOGINALDOGS #DoginaldDogs #DOGICOIN #Web3'
+  );
+  window.open('https://twitter.com/intent/tweet?text=' + text, '_blank');
+});
+
 // Input
-let jumpPressed = false;
 function doJump() {
   if (gameState === 'START') { startGame(); return; }
-  if (gameState === 'GAMEOVER') { startGame(); return; }
+  if (gameState === 'GAMEOVER') return; // handled by overlay buttons
   if (dog.onGround) {
     dog.vy = JUMP_VEL;
     dog.onGround = false;
@@ -237,12 +604,20 @@ function doJump() {
 }
 
 document.addEventListener('keydown', e => {
-  if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); doJump(); }
+  if (e.code === 'Space' || e.code === 'ArrowUp') {
+    e.preventDefault();
+    if (gameState === 'GAMEOVER') return;
+    doJump();
+  }
 });
-canvas.addEventListener('click', doJump);
-canvas.addEventListener('touchstart', e => { e.preventDefault(); doJump(); }, { passive: false });
+canvas.addEventListener('click', () => { if (gameState !== 'GAMEOVER') doJump(); });
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (gameState !== 'GAMEOVER') doJump();
+}, { passive: false });
 
 function startGame() {
+  hideGameOverUI();
   gameState = 'PLAYING';
   score = 0;
   frameCount = 0;
@@ -257,24 +632,16 @@ function startGame() {
 function drawPixelDog(x, y, w, h) {
   const s = w / 10;
   ctx.fillStyle = C.pinkHot;
-  // Body
   ctx.fillRect(x + 2*s, y + 3*s, 6*s, 4*s);
-  // Head
   ctx.fillRect(x + 6*s, y + 1*s, 4*s, 4*s);
-  // Ear
   ctx.fillStyle = C.coral;
   ctx.fillRect(x + 8*s, y, 2*s, 2*s);
-  // Eye
   ctx.fillStyle = C.dark;
   ctx.fillRect(x + 8*s, y + 2*s, s, s);
-  // Nose
-  ctx.fillStyle = C.dark;
   ctx.fillRect(x + 10*s - s, y + 3*s, s, s);
-  // Legs
   ctx.fillStyle = C.pink;
   ctx.fillRect(x + 2*s, y + 7*s, 2*s, 3*s);
   ctx.fillRect(x + 6*s, y + 7*s, 2*s, 3*s);
-  // Tail
   ctx.fillStyle = C.pinkHot;
   ctx.fillRect(x, y + 2*s, 2*s, 2*s);
   ctx.fillRect(x - s, y + 1*s, 2*s, s);
@@ -282,15 +649,12 @@ function drawPixelDog(x, y, w, h) {
 
 // Draw obstacle
 function drawObstacle(ob) {
-  // Pixel block
   ctx.fillStyle = ob.color;
   ctx.fillRect(ob.x, ob.y, ob.w, ob.h);
-  // Inner detail
   ctx.fillStyle = C.dark;
   ctx.fillRect(ob.x + 4, ob.y + 4, ob.w - 8, ob.h - 8);
   ctx.fillStyle = ob.color;
   ctx.fillRect(ob.x + 8, ob.y + 8, ob.w - 16, ob.h - 16);
-  // Eyes for cat obstacles
   if (ob.type === 'cat') {
     ctx.fillStyle = C.yellow;
     ctx.fillRect(ob.x + 6, ob.y + 6, 4, 4);
@@ -336,11 +700,10 @@ function update() {
   frameCount++;
   blinkTimer += 0.05;
 
-  // Clear
   ctx.fillStyle = C.dark;
   ctx.fillRect(0, 0, W, H);
 
-  // Stars (always)
+  // Stars
   stars.forEach(s => {
     const alpha = 0.4 + Math.sin(blinkTimer + s.flicker) * 0.3;
     ctx.globalAlpha = alpha;
@@ -354,7 +717,6 @@ function update() {
   // Ground
   ctx.fillStyle = C.yellow;
   ctx.fillRect(0, GROUND_Y, W, 3);
-  // Ground pattern
   ctx.fillStyle = 'rgba(255,225,84,0.15)';
   for (let x = -(frameCount * 2) % 20; x < W; x += 20) {
     ctx.fillRect(x, GROUND_Y + 3, 10, 2);
@@ -367,7 +729,7 @@ function update() {
   } else if (gameState === 'PLAYING') {
     updatePlaying();
   } else if (gameState === 'GAMEOVER') {
-    drawGameOver();
+    drawGameOverCanvas();
   }
 
   requestAnimationFrame(update);
@@ -378,17 +740,14 @@ function updatePlaying() {
   speed = 4 + Math.floor(score / 200) * 0.5;
   if (speed > 14) speed = 14;
 
-  // Spawn
   const spawnRate = Math.max(40, 100 - Math.floor(score / 100) * 5);
   if (frameCount % spawnRate === 0) spawnObstacle();
 
-  // Update obstacles
   for (let i = obstacles.length - 1; i >= 0; i--) {
     obstacles[i].x -= speed;
     if (obstacles[i].x + obstacles[i].w < 0) obstacles.splice(i, 1);
   }
 
-  // Dog physics
   if (!dog.onGround) {
     dog.vy += GRAVITY;
     dog.y += dog.vy;
@@ -399,29 +758,24 @@ function updatePlaying() {
     }
   }
 
-  // Draw obstacles
   obstacles.forEach(drawObstacle);
 
-  // Draw dog
   if (dogSpriteLoaded) {
     ctx.drawImage(dogSpriteImg, dog.x - 8, dog.y - 8, dog.w + 16, dog.h + 16);
   } else {
     drawPixelDog(dog.x, dog.y, dog.w, dog.h);
   }
 
-  // Collision
   if (checkCollision()) {
     gameState = 'GAMEOVER';
-    saveScore(score);
+    showGameOverUI();
   }
 
-  // Update HUD
   document.getElementById('scoreDisplay').textContent = 'SCORE: ' + score;
   document.getElementById('dogiDisplay').textContent = 'DOGI: ' + (score / 100).toFixed(2);
 }
 
 function drawStartScreen() {
-  // Bouncing dog
   const bounceY = Math.sin(blinkTimer * 2) * 15;
 
   if (dogSpriteLoaded) {
@@ -430,7 +784,6 @@ function drawStartScreen() {
     drawPixelDog(W/2 - 25, 190 + bounceY, 50, 50);
   }
 
-  // Title
   ctx.font = '32px "Press Start 2P"';
   ctx.fillStyle = C.coral;
   ctx.textAlign = 'center';
@@ -440,22 +793,25 @@ function drawStartScreen() {
   ctx.fillStyle = C.yellow;
   ctx.fillText('Earn DOGI Tokens', W/2, 110);
 
-  // Blink text
+  if (playerName) {
+    ctx.font = '9px "Press Start 2P"';
+    ctx.fillStyle = C.pink;
+    ctx.fillText('PLAYER: ' + playerName.toUpperCase(), W/2, 135);
+  }
+
   if (Math.sin(blinkTimer * 3) > 0) {
     ctx.font = '11px "Press Start 2P"';
     ctx.fillStyle = C.white;
     ctx.fillText('PRESS SPACE TO START', W/2, 310);
   }
 
-  // Mobile button
   ctx.fillStyle = C.yellow;
   ctx.fillRect(W/2 - 80, 330, 160, 36);
   ctx.font = '10px "Press Start 2P"';
   ctx.fillStyle = C.dark;
   ctx.fillText('PLAY NOW', W/2, 353);
 
-  // Best score
-  const best = getBest();
+  const best = getPlayerBest();
   if (best > 0) {
     ctx.font = '9px "Press Start 2P"';
     ctx.fillStyle = C.mint;
@@ -463,76 +819,30 @@ function drawStartScreen() {
   }
 }
 
-function drawGameOver() {
-  // Dim overlay
-  ctx.fillStyle = 'rgba(7,7,15,0.8)';
-  ctx.fillRect(0, 0, W, H);
-
-  // Draw obstacles frozen
+function drawGameOverCanvas() {
+  // Minimal canvas drawing — the real UI is in the HTML overlay
   obstacles.forEach(drawObstacle);
-
-  // Draw dog frozen
   if (dogSpriteLoaded) {
     ctx.drawImage(dogSpriteImg, dog.x - 8, dog.y - 8, dog.w + 16, dog.h + 16);
   } else {
     drawPixelDog(dog.x, dog.y, dog.w, dog.h);
   }
-
-  ctx.fillStyle = 'rgba(7,7,15,0.85)';
+  // Dim
+  ctx.fillStyle = 'rgba(7,7,15,0.7)';
   ctx.fillRect(0, 0, W, H);
 
   ctx.textAlign = 'center';
-
-  ctx.font = '24px "Press Start 2P"';
-  ctx.fillStyle = C.coral;
-  ctx.fillText('GAME OVER', W/2, 70);
-
   ctx.font = '14px "Press Start 2P"';
-  ctx.fillStyle = C.white;
-  ctx.fillText('SCORE: ' + score, W/2, 110);
-
-  ctx.font = '12px "Press Start 2P"';
+  ctx.fillStyle = C.coral;
+  ctx.fillText('GAME OVER', W/2, H/2 - 10);
+  ctx.font = '10px "Press Start 2P"';
   ctx.fillStyle = C.yellow;
-  ctx.fillText('DOGI EARNED: ' + (score/100).toFixed(2), W/2, 140);
-
-  const best = getBest();
-  ctx.font = '10px "Press Start 2P"';
-  ctx.fillStyle = C.mint;
-  ctx.fillText('PERSONAL BEST: ' + best, W/2, 170);
-
-  // Leaderboard
-  const lb = getLeaderboard();
-  ctx.font = '10px "Press Start 2P"';
-  ctx.fillStyle = C.lavender;
-  ctx.fillText('- LEADERBOARD -', W/2, 210);
-
-  const lbColors = [C.yellow, C.white, C.cream, C.pink, C.cyan];
-  lb.forEach((s, i) => {
-    ctx.font = '9px "Press Start 2P"';
-    ctx.fillStyle = lbColors[i] || C.white;
-    ctx.fillText((i+1) + '. ' + s + '  (DOGI: ' + (s/100).toFixed(2) + ')', W/2, 240 + i * 24);
-  });
-
-  // Play again
-  ctx.fillStyle = C.yellow;
-  const btnY = Math.max(260 + lb.length * 24, 340);
-  ctx.fillRect(W/2 - 100, btnY, 200, 36);
-  ctx.font = '10px "Press Start 2P"';
-  ctx.fillStyle = C.dark;
-  ctx.fillText('PLAY AGAIN', W/2, btnY + 23);
-
-  if (Math.sin(blinkTimer * 3) > 0) {
-    ctx.font = '9px "Press Start 2P"';
-    ctx.fillStyle = C.white;
-    ctx.fillText('PRESS SPACE', W/2, btnY + 56);
-  }
-
-  document.getElementById('scoreDisplay').textContent = 'SCORE: ' + score;
-  document.getElementById('dogiDisplay').textContent = 'DOGI: ' + (score / 100).toFixed(2);
+  ctx.fillText('SCORE: ' + score, W/2, H/2 + 16);
 }
 
 // Start
 document.fonts.ready.then(() => {
+  initNameEntry();
   update();
 });
 </script>
