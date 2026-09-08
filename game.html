@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOG DASH — Doginal Dogs Game</title>
+<link rel="icon" href="https://cdn.prod.website-files.com/691115821a026cc99483f73b/69272481103bbdc05716c6f6_paw_PNG.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink-light: #ffd0eb;
+  --pink: #ffb1dd;
+  --lavender: #debcff;
+  --cyan: #64ffff;
+  --mint: #4ffcd1;
+  --green: #8dffa4;
+  --cream: #f8e49e;
+  --yellow: #ffe154;
+  --coral: #ff7d82;
+  --dark: #0d0d1a;
+  --darker: #07070f;
+  --white: #ffffff;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--dark);
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+.pixel-font { font-family: 'Press Start 2P', monospace; }
+
+/* Nav */
+.nav {
+  width: 100%;
+  background: var(--darker);
+  border-bottom: 2px solid rgba(255,225,84,0.15);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav a { color: var(--white); text-decoration: none; }
+.nav img { height: 30px; }
+.nav-back {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--cyan);
+}
+.nav-back:hover { color: var(--yellow); }
+
+.pixel-border-strip {
+  width: 100%;
+  height: 4px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--pink) 0px, var(--pink) 12px,
+    var(--cyan) 12px, var(--cyan) 24px,
+    var(--yellow) 24px, var(--yellow) 36px,
+    var(--mint) 36px, var(--mint) 48px
+  );
+}
+
+.game-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  width: 100%;
+  max-width: 840px;
+  position: relative;
+}
+
+.game-container {
+  position: relative;
+  border: 4px solid var(--yellow);
+  box-shadow: 0 0 30px rgba(255,225,84,0.3), 0 0 60px rgba(255,177,221,0.1);
+  background: var(--dark);
+}
+
+canvas#gameCanvas {
+  display: block;
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+}
+
+/* Decor images */
+.game-decor {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10;
+}
+.decor-bark { width: 80px; top: -10px; right: -10px; }
+.decor-ball { width: 50px; bottom: -10px; left: -10px; animation: bounceDec 1s ease-in-out infinite alternate; }
+@keyframes bounceDec {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+.score-bar {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 800px;
+  padding: 12px 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+}
+.score-bar .dogi { color: var(--yellow); }
+.score-bar .score { color: var(--cyan); }
+
+.game-info {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+}
+.game-info kbd {
+  background: var(--darker);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 2px 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--cream);
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html"><img src="https://cdn.prod.website-files.com/691115821a026cc99483f73b/6911292c0fcfc7c8195a3123_Doginal%20Dogs%20LOGO%20White.png" alt="Doginal Dogs"></a>
+  <a href="index.html" class="nav-back">&larr; Back to Hub</a>
+</nav>
+<div class="pixel-border-strip"></div>
+
+<div class="game-wrap">
+  <div class="score-bar">
+    <span class="score" id="scoreDisplay">SCORE: 0</span>
+    <span class="dogi" id="dogiDisplay">DOGI: 0.00</span>
+  </div>
+
+  <div class="game-container">
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <img src="https://cdn.prod.website-files.com/691115821a026cc99483f73b/69272480103bbdc05716c628_BARKING-.gif" alt="" class="game-decor decor-bark">
+    <img src="https://cdn.prod.website-files.com/691115821a026cc99483f73b/69272480103bbdc05716c626_Bouncing-ball.gif" alt="" class="game-decor decor-ball">
+  </div>
+
+  <p class="game-info"><kbd>SPACE</kbd> or <kbd>UP</kbd> or <kbd>TAP</kbd> to jump</p>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const W = 800, H = 400;
+
+// Load dog sprite image
+const dogSpriteImg = new Image();
+dogSpriteImg.crossOrigin = 'anonymous';
+dogSpriteImg.src = 'https://cdn.prod.website-files.com/691115821a026cc99483f73b/692734989b144598a56a8f4c___0000_Layer-3-copy.png';
+let dogSpriteLoaded = false;
+dogSpriteImg.onload = () => { dogSpriteLoaded = true; };
+
+// Colors
+const C = {
+  dark: '#0d0d1a',
+  darker: '#07070f',
+  yellow: '#ffe154',
+  pink: '#ffd0eb',
+  pinkHot: '#ffb1dd',
+  cyan: '#64ffff',
+  coral: '#ff7d82',
+  mint: '#4ffcd1',
+  green: '#8dffa4',
+  lavender: '#debcff',
+  cream: '#f8e49e',
+  white: '#ffffff'
+};
+
+// Stars
+const stars = [];
+for (let i = 0; i < 80; i++) {
+  stars.push({
+    x: Math.random() * W,
+    y: Math.random() * (H - 80),
+    size: Math.random() * 2 + 0.5,
+    speed: Math.random() * 0.3 + 0.1,
+    color: [C.white, C.cyan, C.pink, C.yellow, C.mint, C.lavender][Math.floor(Math.random() * 6)],
+    flicker: Math.random() * Math.PI * 2
+  });
+}
+
+// Game state
+const GROUND_Y = H - 60;
+const GRAVITY = 0.65;
+const JUMP_VEL = -13;
+
+let gameState = 'START'; // START, PLAYING, GAMEOVER
+let score = 0;
+let frameCount = 0;
+let speed = 4;
+let obstacles = [];
+let dog = { x: 80, y: GROUND_Y - 40, w: 40, h: 40, vy: 0, onGround: true };
+let blinkTimer = 0;
+
+// Leaderboard
+function getLeaderboard() {
+  try { return JSON.parse(localStorage.getItem('dd_leaderboard') || '[]'); } catch { return []; }
+}
+function saveScore(s) {
+  const lb = getLeaderboard();
+  lb.push(s);
+  lb.sort((a, b) => b - a);
+  localStorage.setItem('dd_leaderboard', JSON.stringify(lb.slice(0, 5)));
+}
+function getBest() {
+  const lb = getLeaderboard();
+  return lb.length ? lb[0] : 0;
+}
+
+// Input
+let jumpPressed = false;
+function doJump() {
+  if (gameState === 'START') { startGame(); return; }
+  if (gameState === 'GAMEOVER') { startGame(); return; }
+  if (dog.onGround) {
+    dog.vy = JUMP_VEL;
+    dog.onGround = false;
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); doJump(); }
+});
+canvas.addEventListener('click', doJump);
+canvas.addEventListener('touchstart', e => { e.preventDefault(); doJump(); }, { passive: false });
+
+function startGame() {
+  gameState = 'PLAYING';
+  score = 0;
+  frameCount = 0;
+  speed = 4;
+  obstacles = [];
+  dog.y = GROUND_Y - dog.h;
+  dog.vy = 0;
+  dog.onGround = true;
+}
+
+// Draw pixel dog (fallback)
+function drawPixelDog(x, y, w, h) {
+  const s = w / 10;
+  ctx.fillStyle = C.pinkHot;
+  // Body
+  ctx.fillRect(x + 2*s, y + 3*s, 6*s, 4*s);
+  // Head
+  ctx.fillRect(x + 6*s, y + 1*s, 4*s, 4*s);
+  // Ear
+  ctx.fillStyle = C.coral;
+  ctx.fillRect(x + 8*s, y, 2*s, 2*s);
+  // Eye
+  ctx.fillStyle = C.dark;
+  ctx.fillRect(x + 8*s, y + 2*s, s, s);
+  // Nose
+  ctx.fillStyle = C.dark;
+  ctx.fillRect(x + 10*s - s, y + 3*s, s, s);
+  // Legs
+  ctx.fillStyle = C.pink;
+  ctx.fillRect(x + 2*s, y + 7*s, 2*s, 3*s);
+  ctx.fillRect(x + 6*s, y + 7*s, 2*s, 3*s);
+  // Tail
+  ctx.fillStyle = C.pinkHot;
+  ctx.fillRect(x, y + 2*s, 2*s, 2*s);
+  ctx.fillRect(x - s, y + 1*s, 2*s, s);
+}
+
+// Draw obstacle
+function drawObstacle(ob) {
+  // Pixel block
+  ctx.fillStyle = ob.color;
+  ctx.fillRect(ob.x, ob.y, ob.w, ob.h);
+  // Inner detail
+  ctx.fillStyle = C.dark;
+  ctx.fillRect(ob.x + 4, ob.y + 4, ob.w - 8, ob.h - 8);
+  ctx.fillStyle = ob.color;
+  ctx.fillRect(ob.x + 8, ob.y + 8, ob.w - 16, ob.h - 16);
+  // Eyes for cat obstacles
+  if (ob.type === 'cat') {
+    ctx.fillStyle = C.yellow;
+    ctx.fillRect(ob.x + 6, ob.y + 6, 4, 4);
+    ctx.fillRect(ob.x + ob.w - 10, ob.y + 6, 4, 4);
+    ctx.fillStyle = C.dark;
+    ctx.fillRect(ob.x + 7, ob.y + 7, 2, 2);
+    ctx.fillRect(ob.x + ob.w - 9, ob.y + 7, 2, 2);
+  }
+}
+
+// Spawn obstacle
+function spawnObstacle() {
+  const types = [
+    { type: 'block', w: 30, h: 30 + Math.random() * 20, color: C.coral },
+    { type: 'cat', w: 28, h: 28, color: C.lavender },
+    { type: 'block', w: 24, h: 40 + Math.random() * 15, color: C.cyan },
+    { type: 'block', w: 35, h: 25, color: C.cream }
+  ];
+  const t = types[Math.floor(Math.random() * types.length)];
+  obstacles.push({
+    x: W + 10,
+    y: GROUND_Y - t.h,
+    w: t.w,
+    h: t.h,
+    color: t.color,
+    type: t.type
+  });
+}
+
+// Collision
+function checkCollision() {
+  const dx = dog.x + 6, dy = dog.y + 4, dw = dog.w - 12, dh = dog.h - 4;
+  for (const ob of obstacles) {
+    if (dx < ob.x + ob.w && dx + dw > ob.x && dy < ob.y + ob.h && dy + dh > ob.y) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Main loop
+function update() {
+  frameCount++;
+  blinkTimer += 0.05;
+
+  // Clear
+  ctx.fillStyle = C.dark;
+  ctx.fillRect(0, 0, W, H);
+
+  // Stars (always)
+  stars.forEach(s => {
+    const alpha = 0.4 + Math.sin(blinkTimer + s.flicker) * 0.3;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = s.color;
+    ctx.fillRect(s.x, s.y, s.size, s.size);
+    s.x -= s.speed;
+    if (s.x < 0) s.x = W;
+  });
+  ctx.globalAlpha = 1;
+
+  // Ground
+  ctx.fillStyle = C.yellow;
+  ctx.fillRect(0, GROUND_Y, W, 3);
+  // Ground pattern
+  ctx.fillStyle = 'rgba(255,225,84,0.15)';
+  for (let x = -(frameCount * 2) % 20; x < W; x += 20) {
+    ctx.fillRect(x, GROUND_Y + 3, 10, 2);
+  }
+  ctx.fillStyle = 'rgba(255,225,84,0.06)';
+  ctx.fillRect(0, GROUND_Y + 5, W, H - GROUND_Y - 5);
+
+  if (gameState === 'START') {
+    drawStartScreen();
+  } else if (gameState === 'PLAYING') {
+    updatePlaying();
+  } else if (gameState === 'GAMEOVER') {
+    drawGameOver();
+  }
+
+  requestAnimationFrame(update);
+}
+
+function updatePlaying() {
+  score++;
+  speed = 4 + Math.floor(score / 200) * 0.5;
+  if (speed > 14) speed = 14;
+
+  // Spawn
+  const spawnRate = Math.max(40, 100 - Math.floor(score / 100) * 5);
+  if (frameCount % spawnRate === 0) spawnObstacle();
+
+  // Update obstacles
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    obstacles[i].x -= speed;
+    if (obstacles[i].x + obstacles[i].w < 0) obstacles.splice(i, 1);
+  }
+
+  // Dog physics
+  if (!dog.onGround) {
+    dog.vy += GRAVITY;
+    dog.y += dog.vy;
+    if (dog.y >= GROUND_Y - dog.h) {
+      dog.y = GROUND_Y - dog.h;
+      dog.vy = 0;
+      dog.onGround = true;
+    }
+  }
+
+  // Draw obstacles
+  obstacles.forEach(drawObstacle);
+
+  // Draw dog
+  if (dogSpriteLoaded) {
+    ctx.drawImage(dogSpriteImg, dog.x - 8, dog.y - 8, dog.w + 16, dog.h + 16);
+  } else {
+    drawPixelDog(dog.x, dog.y, dog.w, dog.h);
+  }
+
+  // Collision
+  if (checkCollision()) {
+    gameState = 'GAMEOVER';
+    saveScore(score);
+  }
+
+  // Update HUD
+  document.getElementById('scoreDisplay').textContent = 'SCORE: ' + score;
+  document.getElementById('dogiDisplay').textContent = 'DOGI: ' + (score / 100).toFixed(2);
+}
+
+function drawStartScreen() {
+  // Bouncing dog
+  const bounceY = Math.sin(blinkTimer * 2) * 15;
+
+  if (dogSpriteLoaded) {
+    ctx.drawImage(dogSpriteImg, W/2 - 40, 180 + bounceY, 80, 80);
+  } else {
+    drawPixelDog(W/2 - 25, 190 + bounceY, 50, 50);
+  }
+
+  // Title
+  ctx.font = '32px "Press Start 2P"';
+  ctx.fillStyle = C.coral;
+  ctx.textAlign = 'center';
+  ctx.fillText('DOG DASH', W/2, 80);
+
+  ctx.font = '12px "Press Start 2P"';
+  ctx.fillStyle = C.yellow;
+  ctx.fillText('Earn DOGI Tokens', W/2, 110);
+
+  // Blink text
+  if (Math.sin(blinkTimer * 3) > 0) {
+    ctx.font = '11px "Press Start 2P"';
+    ctx.fillStyle = C.white;
+    ctx.fillText('PRESS SPACE TO START', W/2, 310);
+  }
+
+  // Mobile button
+  ctx.fillStyle = C.yellow;
+  ctx.fillRect(W/2 - 80, 330, 160, 36);
+  ctx.font = '10px "Press Start 2P"';
+  ctx.fillStyle = C.dark;
+  ctx.fillText('PLAY NOW', W/2, 353);
+
+  // Best score
+  const best = getBest();
+  if (best > 0) {
+    ctx.font = '9px "Press Start 2P"';
+    ctx.fillStyle = C.mint;
+    ctx.fillText('BEST: ' + best + '  |  DOGI: ' + (best/100).toFixed(2), W/2, 385);
+  }
+}
+
+function drawGameOver() {
+  // Dim overlay
+  ctx.fillStyle = 'rgba(7,7,15,0.8)';
+  ctx.fillRect(0, 0, W, H);
+
+  // Draw obstacles frozen
+  obstacles.forEach(drawObstacle);
+
+  // Draw dog frozen
+  if (dogSpriteLoaded) {
+    ctx.drawImage(dogSpriteImg, dog.x - 8, dog.y - 8, dog.w + 16, dog.h + 16);
+  } else {
+    drawPixelDog(dog.x, dog.y, dog.w, dog.h);
+  }
+
+  ctx.fillStyle = 'rgba(7,7,15,0.85)';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.textAlign = 'center';
+
+  ctx.font = '24px "Press Start 2P"';
+  ctx.fillStyle = C.coral;
+  ctx.fillText('GAME OVER', W/2, 70);
+
+  ctx.font = '14px "Press Start 2P"';
+  ctx.fillStyle = C.white;
+  ctx.fillText('SCORE: ' + score, W/2, 110);
+
+  ctx.font = '12px "Press Start 2P"';
+  ctx.fillStyle = C.yellow;
+  ctx.fillText('DOGI EARNED: ' + (score/100).toFixed(2), W/2, 140);
+
+  const best = getBest();
+  ctx.font = '10px "Press Start 2P"';
+  ctx.fillStyle = C.mint;
+  ctx.fillText('PERSONAL BEST: ' + best, W/2, 170);
+
+  // Leaderboard
+  const lb = getLeaderboard();
+  ctx.font = '10px "Press Start 2P"';
+  ctx.fillStyle = C.lavender;
+  ctx.fillText('- LEADERBOARD -', W/2, 210);
+
+  const lbColors = [C.yellow, C.white, C.cream, C.pink, C.cyan];
+  lb.forEach((s, i) => {
+    ctx.font = '9px "Press Start 2P"';
+    ctx.fillStyle = lbColors[i] || C.white;
+    ctx.fillText((i+1) + '. ' + s + '  (DOGI: ' + (s/100).toFixed(2) + ')', W/2, 240 + i * 24);
+  });
+
+  // Play again
+  ctx.fillStyle = C.yellow;
+  const btnY = Math.max(260 + lb.length * 24, 340);
+  ctx.fillRect(W/2 - 100, btnY, 200, 36);
+  ctx.font = '10px "Press Start 2P"';
+  ctx.fillStyle = C.dark;
+  ctx.fillText('PLAY AGAIN', W/2, btnY + 23);
+
+  if (Math.sin(blinkTimer * 3) > 0) {
+    ctx.font = '9px "Press Start 2P"';
+    ctx.fillStyle = C.white;
+    ctx.fillText('PRESS SPACE', W/2, btnY + 56);
+  }
+
+  document.getElementById('scoreDisplay').textContent = 'SCORE: ' + score;
+  document.getElementById('dogiDisplay').textContent = 'DOGI: ' + (score / 100).toFixed(2);
+}
+
+// Start
+document.fonts.ready.then(() => {
+  update();
+});
+</script>
+</body>
+</html>
